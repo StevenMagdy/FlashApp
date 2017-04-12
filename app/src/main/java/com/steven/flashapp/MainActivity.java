@@ -1,5 +1,6 @@
 package com.steven.flashapp;
 
+import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.hardware.Camera;
 import android.os.Build;
@@ -34,11 +35,17 @@ public class MainActivity extends AppCompatActivity {
 			public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
 				if (!hasFlash) return;
 				if (isChecked) {
-					openCamera(Camera.CameraInfo.CAMERA_FACING_BACK);
-					turnFlashOn();
+					Intent intent = new Intent(MainActivity.this, FlashService.class);
+					intent.setAction(Utils.ACTION_FLASH_ON);
+					startService(intent);
+//					openCamera(Camera.CameraInfo.CAMERA_FACING_BACK);
+//					turnFlashOn();
 				} else {
-					turnFlashOff();
-					closeCamera();
+					Intent intent = new Intent(MainActivity.this, FlashService.class);
+					intent.setAction(Utils.ACTION_FLASH_OFF);
+					startService(intent);
+//					turnFlashOff();
+//					closeCamera();
 				}
 			}
 		});
