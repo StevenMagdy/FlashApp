@@ -6,9 +6,11 @@
 	android:layout_height="match_parent"
 	tools:context="com.steven.flashapp.MainActivity">
 
-	<android.support.v7.widget.SwitchCompat
-		android:id="@+id/switch_flash"
-		android:layout_width="wrap_content"
-		android:layout_height="wrap_content"
-		android:layout_centerInParent="true"/>
+	<ImageButton
+		android:id="@+id/imageButton_flash"
+		android:layout_width="150dp"
+		android:layout_height="150dp"
+		android:layout_centerInParent="true"
+		android:scaleType="fitCenter"
+		android:src="@drawable/ic_flash_off_black_48dp"/>
 </RelativeLayout>
