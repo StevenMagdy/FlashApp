@@ -9,6 +9,7 @@ import android.os.Handler;
 import android.os.HandlerThread;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -21,7 +22,7 @@ public class FlashService extends Service {
 
 	private Camera camera;
 	private Camera.Parameters cameraParameters;
-	static boolean IS_FLASH_ON = false;
+	//static boolean IS_FLASH_ON = false;
 	private Handler serviceHandler;
 
 
@@ -48,10 +49,10 @@ public class FlashService extends Service {
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(LOG_TAG, "Service Starting");
 
-		if (intent.getAction().equals(Utils.ACTION_FLASH_ON)) {
+		if (intent.getAction().equals(Utils.ACTION_TURN_FLASH_ON)) {
 			serviceHandler.post(turnFlashOnRunnable);
 			Intent notificationIntent = new Intent(this, FlashService.class);
-			notificationIntent.setAction(Utils.ACTION_FLASH_OFF);
+			notificationIntent.setAction(Utils.ACTION_TURN_FLASH_OFF);
 			PendingIntent notificationPendingIntent = PendingIntent.getService(this,
 					Utils.ACTION_FLASH_OFF_PENDING_INTENT_ID,
 					notificationIntent,
@@ -68,7 +69,7 @@ public class FlashService extends Service {
 							.setAutoCancel(true)
 							.setOngoing(true);
 			startForeground(Utils.NOTIFICATION_ID, notificationBuilder.build());
-		} else if (intent.getAction().equals(Utils.ACTION_FLASH_OFF)) {
+		} else if (intent.getAction().equals(Utils.ACTION_TURN_FLASH_OFF)) {
 			serviceHandler.post(turnFlashOffRunnable);
 			// turnFlashOff();
 			// closeCamera();
@@ -108,7 +109,9 @@ public class FlashService extends Service {
 		camera.setParameters(cameraParameters);
 		camera.startPreview();
 		Log.i(LOG_TAG, "Flash turned on");
-		IS_FLASH_ON = true;
+		//IS_FLASH_ON = true;
+		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Utils
+				.ACTION_FLASH_TURNED_ON));
 	}
 
 	private void openCamera(int cameraId) {
@@ -130,7 +133,8 @@ public class FlashService extends Service {
 		cameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
 		camera.setParameters(cameraParameters);
 		camera.stopPreview();
-		IS_FLASH_ON = false;
+		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Utils
+				.ACTION_FLASH_TURNED_OFF));
 		Log.i(LOG_TAG, "Flash turned off");
 	}
 
