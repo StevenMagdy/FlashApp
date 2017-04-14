@@ -24,10 +24,11 @@ public class MainActivity extends AppCompatActivity {
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
 		super.onCreate(savedInstanceState);
 		Log.i(LOG_TAG, "Activity Created");
-
 		setContentView(R.layout.activity_main);
+
 		hasFlash = getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
 
 		flashImageButton = (ImageButton) findViewById(R.id.imageButton_flash);

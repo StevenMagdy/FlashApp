@@ -22,7 +22,6 @@ public class FlashService extends Service {
 
 	private Camera camera;
 	private Camera.Parameters cameraParameters;
-	//static boolean IS_FLASH_ON = false;
 	private Handler serviceHandler;
 
 
@@ -71,10 +70,6 @@ public class FlashService extends Service {
 			startForeground(Utils.NOTIFICATION_ID, notificationBuilder.build());
 		} else if (intent.getAction().equals(Utils.ACTION_TURN_FLASH_OFF)) {
 			serviceHandler.post(turnFlashOffRunnable);
-			// turnFlashOff();
-			// closeCamera();
-			//serviceHandler.post(closeCameraRunnable);
-			//stopSelf();
 		}
 		return START_STICKY;
 	}
@@ -88,7 +83,6 @@ public class FlashService extends Service {
 	@Override
 	public void onDestroy() {
 		serviceHandler.getLooper().quit();
-
 		super.onDestroy();
 		Log.i(LOG_TAG, "Service Destroyed");
 	}
@@ -109,7 +103,6 @@ public class FlashService extends Service {
 		camera.setParameters(cameraParameters);
 		camera.startPreview();
 		Log.i(LOG_TAG, "Flash turned on");
-		//IS_FLASH_ON = true;
 		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Utils
 				.ACTION_FLASH_TURNED_ON));
 	}
