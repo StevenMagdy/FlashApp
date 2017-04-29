@@ -12,7 +12,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
-import android.widget.Toast;
 
 /**
  * Created by steven on 4/11/17.
@@ -24,6 +23,7 @@ public class FlashService extends Service {
 	private Camera.Parameters cameraParameters;
 	private Handler serviceHandler;
 
+	private static final String LOG_TAG = FlashService.class.getName();
 
 	private Runnable turnFlashOnRunnable = new Runnable() {
 		@Override
@@ -42,18 +42,17 @@ public class FlashService extends Service {
 		}
 	};
 
-	private static final String LOG_TAG = FlashService.class.getName();
 
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(LOG_TAG, "Service Starting");
 
-		if (intent.getAction().equals(Utils.ACTION_TURN_FLASH_ON)) {
+
+		if (!Utils.FLASH_ON) {
 			serviceHandler.post(turnFlashOnRunnable);
 			Intent notificationIntent = new Intent(this, FlashService.class);
-			notificationIntent.setAction(Utils.ACTION_TURN_FLASH_OFF);
 			PendingIntent notificationPendingIntent = PendingIntent.getService(this,
-					Utils.ACTION_FLASH_OFF_PENDING_INTENT_ID,
+					Utils.NOTIFICATION_PENDING_INTENT_ID,
 					notificationIntent,
 					0);
 
@@ -61,15 +60,21 @@ public class FlashService extends Service {
 					(NotificationCompat.Builder) new NotificationCompat
 							.Builder(this)
 							.setContentTitle("Flash is On")
-							.setSmallIcon(R.drawable.ic_flash_on_white_24dp)
+							.setSmallIcon(R.drawable.flash_vector)
 							.setPriority(NotificationCompat.PRIORITY_MAX)
 							.setContentText("Tap to turn flash off")
 							.setContentIntent(notificationPendingIntent)
 							.setAutoCancel(true)
 							.setOngoing(true);
+
 			startForeground(Utils.NOTIFICATION_ID, notificationBuilder.build());
-		} else if (intent.getAction().equals(Utils.ACTION_TURN_FLASH_OFF)) {
+
+			LocalBroadcastManager.getInstance(this)
+					.sendBroadcast(new Intent(Utils.ACTION_FLASH_TURNED_ON));
+		} else {
 			serviceHandler.post(turnFlashOffRunnable);
+			LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Utils
+					.ACTION_FLASH_TURNED_OFF));
 		}
 		return START_STICKY;
 	}
@@ -81,19 +86,20 @@ public class FlashService extends Service {
 	}
 
 	@Override
-	public void onDestroy() {
-		serviceHandler.getLooper().quit();
-		super.onDestroy();
-		Log.i(LOG_TAG, "Service Destroyed");
-	}
-
-	@Override
 	public void onCreate() {
 		super.onCreate();
 		Log.i(LOG_TAG, "Service Created");
 		HandlerThread handlerThread = new HandlerThread("FlashServiceThread");
 		handlerThread.start();
 		serviceHandler = new Handler(handlerThread.getLooper());
+		Utils.FLASH_ON = false;
+	}
+
+	@Override
+	public void onDestroy() {
+		serviceHandler.getLooper().quit();
+		super.onDestroy();
+		Log.i(LOG_TAG, "Service Destroyed");
 	}
 
 	private void turnFlashOn() {
@@ -103,8 +109,7 @@ public class FlashService extends Service {
 		camera.setParameters(cameraParameters);
 		camera.startPreview();
 		Log.i(LOG_TAG, "Flash turned on");
-		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Utils
-				.ACTION_FLASH_TURNED_ON));
+		Utils.FLASH_ON = true;
 	}
 
 	private void openCamera(int cameraId) {
@@ -114,8 +119,11 @@ public class FlashService extends Service {
 				camera = Camera.open(cameraId);
 				Log.i(LOG_TAG, "Camera Opened");
 			} catch (RuntimeException e) {
-				Toast.makeText(this, "Error opening camera", Toast.LENGTH_SHORT).show();
+//				Toast.makeText(this, "Error opening camera", Toast
+//						.LENGTH_SHORT).show();
 				Log.e(LOG_TAG, "Error opening camera", e);
+				stopSelf();
+
 			}
 		}
 	}
@@ -126,8 +134,7 @@ public class FlashService extends Service {
 		cameraParameters.setFlashMode(Camera.Parameters.FLASH_MODE_OFF);
 		camera.setParameters(cameraParameters);
 		camera.stopPreview();
-		LocalBroadcastManager.getInstance(this).sendBroadcast(new Intent(Utils
-				.ACTION_FLASH_TURNED_OFF));
+		Utils.FLASH_ON = false;
 		Log.i(LOG_TAG, "Flash turned off");
 	}
 

@@ -16,7 +16,6 @@ public class MainActivity extends AppCompatActivity {
 
 	private ImageButton flashImageButton;
 	private boolean hasFlash;
-	private boolean flashOn;
 	private IntentFilter serviceIntentFilter;
 	private BroadcastReceiver serviceBroadcastReceiver;
 
@@ -28,7 +27,6 @@ public class MainActivity extends AppCompatActivity {
 		super.onCreate(savedInstanceState);
 		Log.i(LOG_TAG, "Activity Created");
 		setContentView(R.layout.activity_main);
-
 		hasFlash = getPackageManager().hasSystemFeature(PackageManager.FEATURE_CAMERA_FLASH);
 
 		flashImageButton = (ImageButton) findViewById(R.id.imageButton_flash);
@@ -38,17 +36,15 @@ public class MainActivity extends AppCompatActivity {
 			public void onClick(View v) {
 				if (!hasFlash) return;
 				flashImageButton.setEnabled(false);
-				if (!flashOn) {
-					Intent intent = new Intent(MainActivity.this, FlashService.class);
-					intent.setAction(Utils.ACTION_TURN_FLASH_ON);
-					startService(intent);
-				} else {
-					Intent intent = new Intent(MainActivity.this, FlashService.class);
-					intent.setAction(Utils.ACTION_TURN_FLASH_OFF);
-					startService(intent);
-				}
+				Intent intent = new Intent(MainActivity.this, FlashService.class);
+				startService(intent);
 			}
 		});
+		if (Utils.FLASH_ON) {
+			flashImageButton.setImageResource(R.drawable.ic_flash_on_black_48dp);
+		} else {
+			flashImageButton.setImageResource(R.drawable.ic_flash_off_black_48dp);
+		}
 
 		serviceIntentFilter = new IntentFilter();
 		serviceIntentFilter.addAction(Utils.ACTION_FLASH_TURNED_ON);
@@ -60,30 +56,21 @@ public class MainActivity extends AppCompatActivity {
 				switch (intent.getAction()) {
 					case Utils.ACTION_FLASH_TURNED_ON:
 						flashImageButton.setImageResource(R.drawable.ic_flash_on_black_48dp);
-						flashOn = true;
 						break;
 					case Utils.ACTION_FLASH_TURNED_OFF:
 						flashImageButton.setImageResource(R.drawable.ic_flash_off_black_48dp);
-						flashOn = false;
 						break;
 				}
 				flashImageButton.setEnabled(true);
 			}
 		};
-	}
-
-	@Override
-	protected void onResume() {
-		super.onResume();
-		Log.i(LOG_TAG, "Activity Resumed");
 		LocalBroadcastManager.getInstance(this)
 				.registerReceiver(serviceBroadcastReceiver, serviceIntentFilter);
 	}
 
 	@Override
-	protected void onPause() {
-		super.onPause();
-		Log.i(LOG_TAG, "Activity Paused");
+	protected void onDestroy() {
+		super.onDestroy();
 		LocalBroadcastManager.getInstance(this).unregisterReceiver(serviceBroadcastReceiver);
 	}
 }
