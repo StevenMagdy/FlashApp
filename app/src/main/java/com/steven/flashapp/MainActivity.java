@@ -41,9 +41,9 @@ public class MainActivity extends AppCompatActivity {
 			}
 		});
 		if (Utils.FLASH_ON) {
-			flashImageButton.setImageResource(R.drawable.ic_flash_on_black_48dp);
+			flashImageButton.setImageResource(R.mipmap.ic_launcher_round1);
 		} else {
-			flashImageButton.setImageResource(R.drawable.ic_flash_off_black_48dp);
+			flashImageButton.setImageResource(R.drawable.ic_flash_off_round);
 		}
 
 		serviceIntentFilter = new IntentFilter();
@@ -55,10 +55,10 @@ public class MainActivity extends AppCompatActivity {
 			public void onReceive(Context context, Intent intent) {
 				switch (intent.getAction()) {
 					case Utils.ACTION_FLASH_TURNED_ON:
-						flashImageButton.setImageResource(R.drawable.ic_flash_on_black_48dp);
+						flashImageButton.setImageResource(R.mipmap.ic_launcher_round1);
 						break;
 					case Utils.ACTION_FLASH_TURNED_OFF:
-						flashImageButton.setImageResource(R.drawable.ic_flash_off_black_48dp);
+						flashImageButton.setImageResource(R.drawable.ic_flash_off_round);
 						break;
 				}
 				flashImageButton.setEnabled(true);
