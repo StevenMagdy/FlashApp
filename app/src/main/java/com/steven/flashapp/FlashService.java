@@ -42,11 +42,9 @@ public class FlashService extends Service {
 		}
 	};
 
-
 	@Override
 	public int onStartCommand(Intent intent, int flags, int startId) {
 		Log.i(LOG_TAG, "Service Starting");
-
 
 		if (!Utils.FLASH_ON) {
 			serviceHandler.post(turnFlashOnRunnable);
