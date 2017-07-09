@@ -13,10 +13,6 @@ import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.NotificationCompat;
 import android.util.Log;
 
-/**
- * Created by steven on 4/11/17.
- */
-
 public class FlashService extends Service {
 
 	private Camera camera;

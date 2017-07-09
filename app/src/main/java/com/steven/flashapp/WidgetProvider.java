@@ -8,10 +8,6 @@ import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.widget.RemoteViews;
 
-/**
- * Created by steven on 4/14/17.
- */
-
 public class WidgetProvider extends AppWidgetProvider {
 
 	private static final String LOG_TAG = WidgetProvider.class.getName();

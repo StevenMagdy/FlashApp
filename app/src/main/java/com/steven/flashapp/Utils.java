@@ -1,9 +1,5 @@
 package com.steven.flashapp;
 
-/**
- * Created by steven on 4/12/17.
- */
-
 public class Utils {
 
 	public static final String LOG_TAG = Utils.class.getName();
